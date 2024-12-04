@@ -40,6 +40,8 @@ app.get("/docs", (req, res) => {
   res.sendFile(__dirname + "/views/docs.html");
 });
 
+//*************** COHORTS ****************/
+
 //GET COHORTS ROUTES
 app.get("/api/cohorts", (req, res) => {
   Cohort.find({})
@@ -53,11 +55,13 @@ app.get("/api/cohorts", (req, res) => {
     });
 });
 
+//GET COHORT ROUTES BY ID
+
 app.get("/api/cohorts/:cohortId", (req, res) => {
-  Cohort.find({ _id: "616c4b4c649eaa001dd50f81" })
-    .then((cohorts) => {
-      console.log("Retrieved cohorts -->", cohorts);
-      res.json(cohorts);
+  Cohort.findById(req.params.cohortId)
+    .then((oneCohort) => {
+      console.log("Retrieved cohorts -->", oneCohort);
+      res.json(oneCohort);
     })
     .catch((error) => {
       console.error("Error while retrieving cohorts -->", error);
@@ -66,6 +70,41 @@ app.get("/api/cohorts/:cohortId", (req, res) => {
 });
 
 //POST COHORTS ROUTES
+
+app.post("/api/cohorts", (req, res) => {
+  Cohort.create(req.body)
+    .then((createdCohort) => {
+      res.status(201).json(createdCohort);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+//PUT COHORTS ROUTES BY ID
+app.put("/api/cohorts/:cohortId", (req, res) => {
+  Cohort.findByIdAndUpdate(req.params.cohortId, req.body, { new: true })
+    .then((updatedCohort) => {
+      res.status(200).json(updatedCohort);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+//DELETE COHORTS ROUTES BY ID
+
+app.delete("/api/cohorts/:cohortId", (req, res) => {
+  Cohort.findByIdAndDelete(req.params.cohortId)
+    .them((deletedCohort) => {
+      res.status(204).json(deletedCohort);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+//*************** STUDENTS ****************/
 
 //GET STUDENTS ROUTES
 
@@ -81,11 +120,15 @@ app.get("/api/students", (req, res) => {
     });
 });
 
+//GET STUDENT FROM SPECIFIED COHORT
+
+//GET STUDENT ROUTES BY ID
+
 app.get("/api/students/:studentId", (req, res) => {
-  Student.find({ _id: "616c4b4c649eaa001dd50f85" })
-    .then((students) => {
-      console.log("Retrieved students -->", students);
-      res.json(students);
+  Student.find(req.params.studentId)
+    .then((oneStudent) => {
+      console.log("Retrieved students -->", oneStudent);
+      res.json(oneStudent);
     })
     .catch((error) => {
       console.error("Error while retrieving students -->", error);
