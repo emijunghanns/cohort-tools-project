@@ -110,6 +110,7 @@ app.delete("/api/cohorts/:cohortId", (req, res) => {
 
 app.get("/api/students", (req, res) => {
   Student.find({})
+    .populate("cohort")
     .then((students) => {
       console.log("Retrieved students -->", students);
       res.json(students);
@@ -121,13 +122,26 @@ app.get("/api/students", (req, res) => {
 });
 
 //GET STUDENT FROM SPECIFIED COHORT
+app.get("/api/students/cohort/:cohortId", (req, res) => {
+  Student.find({ cohort: req.params.cohortId })
+    .populate("cohort")
+    .then((students) => res.status(200).json(students))
+    .catch((error) =>
+      res.status(500).json({
+        message:
+          "Internal Server Error: Unable to find Students of specified Cohort",
+      })
+    );
+});
 
 //GET STUDENT ROUTES BY ID
 
 app.get("/api/students/:studentId", (req, res) => {
-  Student.find(req.params.studentId)
+  Student.findById(req.params.studentId)
+    .populate("cohort")
     .then((oneStudent) => {
       console.log("Retrieved students -->", oneStudent);
+
       res.json(oneStudent);
     })
     .catch((error) => {
@@ -135,6 +149,47 @@ app.get("/api/students/:studentId", (req, res) => {
       res.status(500).json({ error: "Failed to retrieve students" });
     });
 });
+
+//POST STUDENTS ROUTES
+
+app.post("/api/students", (req, res) => {
+  Student.create(req.body)
+    .populate("cohort")
+    .then((createdStudent) => {
+      res.status(201).json(createdStudent);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+//PUT STUDENTS ROUTES BY ID
+
+app.put("/api/students/:studentId", (req, res) => {
+  Student.findByIdAndUpdate(req.params.studentId, req.body, { new: true })
+    .populate("cohort")
+    .then((updatedStudent) => {
+      res.status(200).json(updatedStudent);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+//DELETE STUDENTS ROUTES BY ID
+
+app.delete("/api/students/:studentId", (req, res) => {
+  Student.findByIdAndDelete(req.params.studentId)
+    .populate("cohort")
+    .then((deletedStudent) => {
+      res.status(204).json(deletedStudent);
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+//****************************************************/
 
 // START SERVER
 app.listen(PORT, () => {

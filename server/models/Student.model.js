@@ -29,7 +29,7 @@ const studentSchema = new Schema({
   },
   background: String,
   image: { type: String, defalut: "https://i.imgur.com/r8bo8u7.png" },
-  cohort: { type: Schema.Types.ObjectId, ref: "cohorts" },
+  cohort: { type: Schema.Types.ObjectId, ref: "Cohort" },
   projects: Array,
 });
 
