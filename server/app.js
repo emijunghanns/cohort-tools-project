@@ -6,8 +6,15 @@ const students = require("./students.json");
 const PORT = 5005;
 const cors = require("cors");
 const mongoose = require("mongoose");
-const Cohort = require("./models/Cohort.model");
-const Student = require("./models/Student.model");
+
+const studentsRouter = require("./routes/students.route");
+const cohortsRouter = require("./routes/cohorts.route");
+const authRouter = require("./routes/auth.routes");
+
+const {
+  errorHandler,
+  notFoundHandler,
+} = require("./middlewares/error-handling");
 // STATIC DATA
 // Devs Team - Import the provided files with JSON data of students and cohorts here:
 // ...
@@ -42,154 +49,20 @@ app.get("/docs", (req, res) => {
 
 //*************** COHORTS ****************/
 
-//GET COHORTS ROUTES
-app.get("/api/cohorts", (req, res) => {
-  Cohort.find({})
-    .then((cohorts) => {
-      console.log("Retrieved cohorts -->", cohorts);
-      res.json(cohorts);
-    })
-    .catch((error) => {
-      console.error("Error while retrieving cohorts -->", error);
-      res.status(500).json({ error: "Failed to retrieve cohorts" });
-    });
-});
-
-//GET COHORT ROUTES BY ID
-
-app.get("/api/cohorts/:cohortId", (req, res) => {
-  Cohort.findById(req.params.cohortId)
-    .then((oneCohort) => {
-      console.log("Retrieved cohorts -->", oneCohort);
-      res.json(oneCohort);
-    })
-    .catch((error) => {
-      console.error("Error while retrieving cohorts -->", error);
-      res.status(500).json({ error: "Failed to retrieve cohorts" });
-    });
-});
-
-//POST COHORTS ROUTES
-
-app.post("/api/cohorts", (req, res) => {
-  Cohort.create(req.body)
-    .then((createdCohort) => {
-      res.status(201).json(createdCohort);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-//PUT COHORTS ROUTES BY ID
-app.put("/api/cohorts/:cohortId", (req, res) => {
-  Cohort.findByIdAndUpdate(req.params.cohortId, req.body, { new: true })
-    .then((updatedCohort) => {
-      res.status(200).json(updatedCohort);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-//DELETE COHORTS ROUTES BY ID
-
-app.delete("/api/cohorts/:cohortId", (req, res) => {
-  Cohort.findByIdAndDelete(req.params.cohortId)
-    .them((deletedCohort) => {
-      res.status(204).json(deletedCohort);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
+app.use("/api/cohorts", cohortsRouter);
 
 //*************** STUDENTS ****************/
 
-//GET STUDENTS ROUTES
+app.use("/api/students", studentsRouter);
 
-app.get("/api/students", (req, res) => {
-  Student.find({})
-    .populate("cohort")
-    .then((students) => {
-      console.log("Retrieved students -->", students);
-      res.json(students);
-    })
-    .catch((error) => {
-      console.error("Error while retrieving students -->", error);
-      res.status(500).json({ error: "Failed to retrieve students" });
-    });
-});
+//*************** USER ****************/
 
-//GET STUDENT FROM SPECIFIED COHORT
-app.get("/api/students/cohort/:cohortId", (req, res) => {
-  Student.find({ cohort: req.params.cohortId })
-    .populate("cohort")
-    .then((students) => res.status(200).json(students))
-    .catch((error) =>
-      res.status(500).json({
-        message:
-          "Internal Server Error: Unable to find Students of specified Cohort",
-      })
-    );
-});
-
-//GET STUDENT ROUTES BY ID
-
-app.get("/api/students/:studentId", (req, res) => {
-  Student.findById(req.params.studentId)
-    .populate("cohort")
-    .then((oneStudent) => {
-      console.log("Retrieved students -->", oneStudent);
-
-      res.json(oneStudent);
-    })
-    .catch((error) => {
-      console.error("Error while retrieving students -->", error);
-      res.status(500).json({ error: "Failed to retrieve students" });
-    });
-});
-
-//POST STUDENTS ROUTES
-
-app.post("/api/students", (req, res) => {
-  Student.create(req.body)
-    .populate("cohort")
-    .then((createdStudent) => {
-      res.status(201).json(createdStudent);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-//PUT STUDENTS ROUTES BY ID
-
-app.put("/api/students/:studentId", (req, res) => {
-  Student.findByIdAndUpdate(req.params.studentId, req.body, { new: true })
-    .populate("cohort")
-    .then((updatedStudent) => {
-      res.status(200).json(updatedStudent);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
-
-//DELETE STUDENTS ROUTES BY ID
-
-app.delete("/api/students/:studentId", (req, res) => {
-  Student.findByIdAndDelete(req.params.studentId)
-    .populate("cohort")
-    .then((deletedStudent) => {
-      res.status(204).json(deletedStudent);
-    })
-    .catch((err) => {
-      res.status(500).json(err);
-    });
-});
+app.use("/auth", authRouter);
 
 //****************************************************/
+
+app.use(errorHandler);
+app.use(notFoundHandler);
 
 // START SERVER
 app.listen(PORT, () => {
