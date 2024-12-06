@@ -1,9 +1,8 @@
 const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
-const cohorts = require("./cohorts.json");
-const students = require("./students.json");
-const PORT = 5005;
+require("dotenv").config();
+
 const cors = require("cors");
 const mongoose = require("mongoose");
 
@@ -65,6 +64,6 @@ app.use(errorHandler);
 app.use(notFoundHandler);
 
 // START SERVER
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server listening on port ${process.env.PORT}`);
 });
