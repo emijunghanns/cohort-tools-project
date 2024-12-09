@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-
 // Import the string from the .env with URL of the API/server - http://localhost:5005
 const API_URL = import.meta.env.VITE_API_URL;
-
 
 const AuthContext = React.createContext();
 
@@ -36,11 +34,11 @@ function AuthProviderWrapper(props) {
           setIsLoggedIn(true);
           setIsLoading(false);
           setUser(user);
+          return;
         })
         .catch((error) => {
           if (error) {
             setAuthError(error.response.data.message);
-            return;
           }
           // If the server sends an error response (invalid token)
           // Update state variables
